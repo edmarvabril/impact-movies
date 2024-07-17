@@ -1,70 +1,100 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { fetchTopRatedMovie, image500 } from "@/utils/api";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  View,
+  ActivityIndicator,
+  Image,
+  Text,
+  FlatList,
+  Button,
+  Dimensions,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const { width } = Dimensions.get("window");
+const numColumns = 2;
+const itemWidth = (width - 32) / numColumns; // Adjusted for padding and margin
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+interface Movie {
+  id: number;
+  title: string;
+  poster_path: string;
+  release_date: string;
+  vote_average: number;
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+const TopRated: React.FC = () => {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchMovies(page);
+  }, [page]);
+
+  const fetchMovies = useCallback(async (pageNumber: number) => {
+    setLoading(true);
+    const data = await fetchTopRatedMovie(pageNumber);
+    setMovies((prevMovies) => [...prevMovies, ...data.results]);
+    setLoading(false);
+  }, []);
+
+  const loadMoreMovies = () => {
+    setPage((prevPage) => prevPage + 1);
+    setShowMore(false);
+  };
+
+  const renderFooter = () => {
+    return (
+      showMore && (
+        <View className="py-4">
+          <Button title="SHOW MORE" onPress={loadMoreMovies} color="#facc15" />
+        </View>
+      )
+    );
+  };
+
+  const renderItem = ({ item }: { item: Movie }) => (
+    <View className="flex-1 m-2" style={{ maxWidth: itemWidth }}>
+      <View className="bg-secondary-bg p-2 rounded-lg">
+        <Image
+          source={{ uri: image500(item.poster_path) }}
+          className="w-full h-64 object-cover rounded-lg"
+          resizeMode="cover"
+        />
+        {/* <Text className="text-primary-text mt-2">{item.title}</Text> */}
+        <Text className="text-primary-text mt-1">
+          {new Date(item.release_date).getFullYear()}
+        </Text>
+        <Text className="text-primary-text mt-1">
+          Rating: {(item.vote_average * 10).toFixed(0)}%
+        </Text>
+      </View>
+    </View>
+  );
+
+  return (
+    <SafeAreaView className="flex-1 bg-primary-bg p-4">
+      <Text className="text-primary-text text-3xl font-bold">Top-Rated</Text>
+      {loading && page === 1 ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#facc15" />
+        </View>
+      ) : (
+        <FlatList
+          data={movies}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          numColumns={numColumns}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          ListFooterComponent={renderFooter}
+          onEndReached={() => setShowMore(true)}
+          onEndReachedThreshold={0.5}
+        />
+      )}
+    </SafeAreaView>
+  );
+};
+
+export default TopRated;

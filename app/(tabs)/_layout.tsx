@@ -1,34 +1,47 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import React from "react";
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Icon } from "@/components/Icon";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarStyle: {
+          backgroundColor: "#1f2937",
+          borderTopWidth: 1,
+          height: 84,
+          borderTopColor: "#facc15",
+        },
+        tabBarActiveTintColor: "#22d3ee",
+        tabBarInactiveTintColor: "#facc15",
         headerShown: false,
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="explore"
         options={{
-          title: 'Home',
+          title: "Explore",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <Icon name={focused ? "film" : "film-outline"} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="index"
         options={{
-          title: 'Explore',
+          title: "Top-Rated",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <Icon name={focused ? "star" : "star-outline"} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="liked"
+        options={{
+          title: "Liked",
+          tabBarIcon: ({ color, focused }) => (
+            <Icon name={focused ? "heart" : "heart-outline"} color={color} />
           ),
         }}
       />
