@@ -3,17 +3,25 @@ import React from "react";
 
 type Props = {
   title: string;
-  styles?: string;
+  containerStyles?: string;
+  labelStyles?: string;
   onPress: () => void;
 };
 
-const StyledButton = ({ title, styles, onPress }: Props) => {
+const StyledButton = ({
+  title,
+  containerStyles,
+  labelStyles,
+  onPress,
+}: Props) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`w-full bg-button-bg h-12 rounded-3xl p-3 justify-center items-center ${styles}`}
+      className={`bg-amber-300 w-full h-12 rounded-3xl p-3 justify-center items-center ${containerStyles}`}
     >
-      <Text className="text-xl font-bold">{title}</Text>
+      <Text className={`text-xl font-semibold text-sky-950 ${labelStyles}`}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };

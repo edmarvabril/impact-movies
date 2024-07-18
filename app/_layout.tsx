@@ -4,8 +4,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -23,12 +26,25 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="light" />
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modals/genres"
+          options={{
+            presentation: "modal",
+            headerTitle: "Genres",
+            headerTitleStyle: {
+              color: "#f9fafb",
+            },
+            headerStyle: {
+              backgroundColor: "#fbbf24",
+            },
+          }}
+        />
       </Stack>
-    </>
+    </QueryClientProvider>
   );
 }

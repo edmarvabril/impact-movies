@@ -8,13 +8,24 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#1f2937",
-          borderTopWidth: 1,
-          height: 84,
-          borderTopColor: "#facc15",
+          backgroundColor: "#27272a",
+          borderRadius: 50,
+          borderTopWidth: 0,
+          position: "absolute",
+          bottom: 40,
+          marginHorizontal: 20,
+          paddingBottom: 14,
+          paddingTop: 8,
+          height: 70,
+          shadowColor: "#171717",
+          shadowOpacity: 0.8,
+          shadowOffset: {
+            height: 3,
+            width: 0,
+          },
+          shadowRadius: 5,
         },
-        tabBarActiveTintColor: "#22d3ee",
-        tabBarInactiveTintColor: "#facc15",
+        tabBarActiveTintColor: "#fcd34d",
         headerShown: false,
       }}
     >
@@ -23,7 +34,11 @@ export default function TabLayout() {
         options={{
           title: "Explore",
           tabBarIcon: ({ color, focused }) => (
-            <Icon name={focused ? "film" : "film-outline"} color={color} />
+            <Icon
+              name={focused ? "film" : "film-outline"}
+              color={color}
+              size={32}
+            />
           ),
         }}
       />
@@ -32,7 +47,11 @@ export default function TabLayout() {
         options={{
           title: "Top-Rated",
           tabBarIcon: ({ color, focused }) => (
-            <Icon name={focused ? "star" : "star-outline"} color={color} />
+            <Icon
+              name={focused ? "star" : "star-outline"}
+              color={color}
+              size={32}
+            />
           ),
         }}
       />
@@ -41,7 +60,11 @@ export default function TabLayout() {
         options={{
           title: "Liked",
           tabBarIcon: ({ color, focused }) => (
-            <Icon name={focused ? "heart" : "heart-outline"} color={color} />
+            <Icon
+              name={focused ? "heart" : "heart-outline"}
+              color={color}
+              size={32}
+            />
           ),
         }}
       />
