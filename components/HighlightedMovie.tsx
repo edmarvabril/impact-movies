@@ -7,16 +7,22 @@ import { Icon } from "./Icon";
 
 interface HighlightedMovieProps {
   movie: {
+    id: number;
     title: string;
     poster_path: string;
     backdrop_path: string;
     release_date: string;
     vote_average: number;
     genres: string[];
+    isLiked: boolean;
   };
+  onLikeToggle: (id: number) => void;
 }
 
-const HighlightedMovie: React.FC<HighlightedMovieProps> = ({ movie }) => {
+const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
+  movie,
+  onLikeToggle,
+}) => {
   return (
     <Animated.View
       entering={FadeIn.duration(500)}
@@ -57,8 +63,15 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({ movie }) => {
               {movie.title} [{new Date(movie.release_date).getFullYear()}]
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-zinc-800 h-8 w-8 rounded-full ml-2 justify-center items-center">
-            <Icon name={"heart-outline"} color="#fcd34d" size={25} />
+          <TouchableOpacity
+            onPress={() => onLikeToggle(movie.id)}
+            className="bg-zinc-800 h-8 w-8 rounded-full ml-2 justify-center items-center"
+          >
+            <Icon
+              name={movie.isLiked ? "heart" : "heart-outline"}
+              color="#facc15"
+              size={25}
+            />
           </TouchableOpacity>
         </View>
 

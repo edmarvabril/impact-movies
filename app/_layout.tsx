@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { LikedMoviesProvider } from "@/contexts/LikedMoviesContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,24 +28,38 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="light" />
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modals/genres"
-          options={{
-            presentation: "modal",
-            headerTitle: "Genres",
-            headerTitleStyle: {
-              color: "#f9fafb",
-            },
-            headerStyle: {
-              backgroundColor: "#fbbf24",
-            },
-          }}
-        />
-      </Stack>
+      <LikedMoviesProvider>
+        <StatusBar style="light" />
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="movie/details"
+            options={{
+              headerTitle: "",
+              headerTintColor: "#f9fafb",
+              headerBackTitleVisible: false,
+              headerStyle: {
+                backgroundColor: "#0f172a",
+              },
+            }}
+          />
+
+          <Stack.Screen
+            name="modals/genres"
+            options={{
+              presentation: "modal",
+              headerTitle: "Genres",
+              headerTitleStyle: {
+                color: "#f9fafb",
+              },
+              headerStyle: {
+                backgroundColor: "#fbbf24",
+              },
+            }}
+          />
+        </Stack>
+      </LikedMoviesProvider>
     </QueryClientProvider>
   );
 }

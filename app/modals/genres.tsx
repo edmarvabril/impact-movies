@@ -34,17 +34,22 @@ const GenreModal: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-white p-4 rounded-lg">
+    <View className="flex-1 p-4">
       <ScrollView>
-        <TouchableOpacity onPress={() => handleGenreSelect(null)}>
-          <Text className="text-black text-lg">ALL</Text>
+        <TouchableOpacity
+          className="items-center rounded-full bg-gray-500 p-1 mb-3"
+          onPress={() => handleGenreSelect(null)}
+        >
+          <Text className="text-gray-50 text-2xl">ALL</Text>
         </TouchableOpacity>
+        <View></View>
         {genresData?.genres.map((genre: Genre) => (
           <TouchableOpacity
+            className="items-center rounded-full bg-gray-500 p-1 mb-3"
             key={genre.id}
             onPress={() => handleGenreSelect(genre.id)}
           >
-            <Text className="text-black text-lg">{genre.name}</Text>
+            <Text className="text-gray-50 text-2xl">{genre.name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

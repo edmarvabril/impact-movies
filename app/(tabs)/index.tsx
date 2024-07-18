@@ -2,160 +2,118 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   ActivityIndicator,
-  Image,
-  Text,
   FlatList,
-  Dimensions,
-  TouchableOpacity,
   SafeAreaView,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 import HighlightedMovie from "@/components/HighlightedMovie";
 import { fetchTopRatedMovie, fetchGenres, image500 } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
-import { Icon } from "@/components/Icon";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import StyledButton from "@/components/StyledButton";
-
-const { width } = Dimensions.get("window");
-const numColumns = 2;
-const itemWidth = (width - 32) / numColumns;
-
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-  release_date: string;
-  vote_average: number;
-  genre_ids: number[];
-  backdrop_path: string;
-}
-
-interface Genre {
-  id: number;
-  name: string;
-}
+import { useLikedMovies } from "@/contexts/LikedMoviesContext";
+import MovieCard from "@/components/MovieCard";
+import { Icon } from "@/components/Icon";
 
 const TopRated: React.FC = () => {
   const router = useRouter();
   const { selectedGenre } = useLocalSearchParams();
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
-  const [showMore, setShowMore] = useState<boolean>(false);
-  const [highlightedMovie, setHighlightedMovie] = useState<Movie | null>(null);
-  const [likedMovies, setLikedMovies] = useState<Set<number>>(new Set());
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [highlightedMovie, setHighlightedMovie] = useState(null);
+  const { likedMovies, toggleLike } = useLikedMovies();
 
   const { data: genresData, isLoading: isGenresLoading } = useQuery({
     queryKey: ["genres"],
     queryFn: fetchGenres,
   });
 
-  const fetchMovies = useCallback(
-    async (pageNumber: number, genreId?: number) => {
-      setLoading(true);
+  const genreId =
+    selectedGenre && selectedGenre !== "null"
+      ? parseInt(selectedGenre)
+      : undefined;
+
+  const fetchMovies = useCallback(async (pageNumber, genreId) => {
+    setLoading(true);
+    try {
       const data = await fetchTopRatedMovie(pageNumber, genreId);
-      if (pageNumber === 1) {
-        setMovies(data.results);
-      } else {
-        setMovies((prevMovies) => [...prevMovies, ...data.results]);
-      }
+      setMovies((prevMovies) =>
+        pageNumber === 1 ? data.results : [...prevMovies, ...data.results]
+      );
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    } finally {
       setLoading(false);
-    },
-    []
-  );
+    }
+  }, []);
 
   useEffect(() => {
-    const genreId =
-      selectedGenre && selectedGenre !== "null"
-        ? parseInt(selectedGenre)
-        : undefined;
+    setPage(1); // Reset to first page when genre changes
+  }, [genreId]);
+
+  useEffect(() => {
     fetchMovies(page, genreId);
-  }, [page, selectedGenre]);
+  }, [page, genreId, fetchMovies]);
 
   useEffect(() => {
     if (movies.length > 0) {
-      const randomIndex = Math.floor(Math.random() * movies.length);
-      setHighlightedMovie(movies[randomIndex]);
-      const intervalId = setInterval(() => {
+      const updateHighlightedMovie = () => {
         const randomIndex = Math.floor(Math.random() * movies.length);
         setHighlightedMovie(movies[randomIndex]);
-      }, 7000);
+      };
 
-      return () => clearInterval(intervalId); // Clear interval on component unmount
+      updateHighlightedMovie();
+      const intervalId = setInterval(updateHighlightedMovie, 7000);
+      return () => clearInterval(intervalId);
     }
   }, [movies]);
 
-  const getGenreNames = (genreIds: number[]) => {
-    if (!genresData) return [];
-    return genreIds.map(
-      (id) =>
-        genresData.genres.find((genre: Genre) => genre.id === id)?.name || ""
-    );
-  };
-
-  const toggleLike = (movieId: number) => {
-    setLikedMovies((prevLikedMovies) => {
-      const newLikedMovies = new Set(prevLikedMovies);
-      if (newLikedMovies.has(movieId)) {
-        newLikedMovies.delete(movieId);
-      } else {
-        newLikedMovies.add(movieId);
-      }
-      return newLikedMovies;
-    });
-  };
-
-  const renderFooter = () => {
-    return (
-      showMore && (
-        <StyledButton
-          onPress={() => setPage(page + 1)}
-          title="Load more!"
-          containerStyles="w-1/2 self-center h-10 p-0"
-          labelStyles="text-lg"
-        />
-      )
-    );
-  };
-
-  const renderHeader = () => {
-    if (highlightedMovie && genresData)
-      return (
-        <HighlightedMovie
-          movie={{
-            title: highlightedMovie.title,
-            poster_path: image500(highlightedMovie.poster_path),
-            backdrop_path: image500(highlightedMovie.backdrop_path),
-            release_date: highlightedMovie.release_date,
-            vote_average: highlightedMovie.vote_average,
-            genres: getGenreNames(highlightedMovie.genre_ids),
-          }}
-        />
+  const getGenreNames = useCallback(
+    (genreIds) => {
+      if (!genresData) return [];
+      return genreIds.map(
+        (id) => genresData.genres.find((genre) => genre.id === id)?.name || ""
       );
-  };
+    },
+    [genresData]
+  );
 
-  const renderItem = ({ item }: { item: Movie }) => (
-    <View className="flex-1 m-2" style={{ maxWidth: itemWidth }}>
-      <View className="bg-secondary-bg p-2 rounded-lg">
-        <Image
-          source={{ uri: image500(item.poster_path) }}
-          className="w-full h-64 object-cover rounded-lg"
-          resizeMode="cover"
-        />
-        <View className="mx-1">
-          <Text className="text-gray-300 font-semibold mt-2">
-            {item.title}{" "}
-            <Text className="text-gray-500">
-              [{new Date(item.release_date).getFullYear()}]
-            </Text>
-          </Text>
-          <Text numberOfLines={1} className="text-amber-300 text-xs mt-1">
-            {(item.vote_average * 10).toFixed(0)}%{" "}
-            <Text className="text-gray-500">Rating</Text>
-          </Text>
-        </View>
-      </View>
-    </View>
+  const renderFooter = () => (
+    <StyledButton
+      onPress={() => setPage((prevPage) => prevPage + 1)}
+      title="Load more!"
+      containerStyles="w-1/2 self-center h-10 p-0"
+      labelStyles="text-lg"
+    />
+  );
+
+  const renderHeader = () =>
+    highlightedMovie &&
+    genresData && (
+      <HighlightedMovie
+        onLikeToggle={(id) => toggleLike(id)}
+        movie={{
+          id: highlightedMovie.id,
+          title: highlightedMovie.title,
+          poster_path: image500(highlightedMovie.poster_path),
+          backdrop_path: image500(highlightedMovie.backdrop_path),
+          release_date: highlightedMovie.release_date,
+          vote_average: highlightedMovie.vote_average,
+          genres: getGenreNames(highlightedMovie.genre_ids),
+          isLiked: likedMovies.has(highlightedMovie.id),
+        }}
+      />
+    );
+
+  const renderItem = ({ item }) => (
+    <MovieCard
+      movie={item}
+      isLiked={likedMovies.has(item.id)}
+      onToggleLike={toggleLike}
+      iconType="heart"
+    />
   );
 
   return (
@@ -186,11 +144,11 @@ const TopRated: React.FC = () => {
           data={movies}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          numColumns={numColumns}
+          numColumns={2}
           columnWrapperStyle={{ justifyContent: "space-between" }}
           ListFooterComponent={renderFooter}
           ListHeaderComponent={renderHeader}
-          onEndReached={() => setShowMore(true)}
+          onEndReached={() => setPage((prevPage) => prevPage + 1)}
           onEndReachedThreshold={0.5}
           contentContainerStyle={{ paddingBottom: 140 }}
         />

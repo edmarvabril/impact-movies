@@ -65,8 +65,10 @@ export const fetchUpComingMovie = (page: number = 1) => {
   return movieApiCall(upComingMoviesEndpoint, { page });
 };
 
-export const fetchTopRatedMovie = (page: number = 1) => {
-  return movieApiCall(topRatedMoviesEndpoint, { page });
+export const fetchTopRatedMovie = (page: number = 1, genreId?: number) => {
+  const params: any = { page };
+  if (genreId) params.with_genres = genreId;
+  return movieApiCall(topRatedMoviesEndpoint, params);
 };
 
 export const fetchGenres = () => {
