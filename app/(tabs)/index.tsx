@@ -65,7 +65,7 @@ const TopRated: React.FC = () => {
       };
 
       updateHighlightedMovie();
-      const intervalId = setInterval(updateHighlightedMovie, 7000);
+      const intervalId = setInterval(updateHighlightedMovie, 4000);
       return () => clearInterval(intervalId);
     }
   }, [movies]);
@@ -111,8 +111,7 @@ const TopRated: React.FC = () => {
     <MovieCard
       movie={item}
       isLiked={likedMovies.has(item.id)}
-      onToggleLike={toggleLike}
-      iconType="heart"
+      onLikeToggle={toggleLike}
     />
   );
 
@@ -148,8 +147,6 @@ const TopRated: React.FC = () => {
           columnWrapperStyle={{ justifyContent: "space-between" }}
           ListFooterComponent={renderFooter}
           ListHeaderComponent={renderHeader}
-          onEndReached={() => setPage((prevPage) => prevPage + 1)}
-          onEndReachedThreshold={0.5}
           contentContainerStyle={{ paddingBottom: 140 }}
         />
       )}

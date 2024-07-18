@@ -69,7 +69,7 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
           >
             <Icon
               name={movie.isLiked ? "heart" : "heart-outline"}
-              color="#facc15"
+              color={movie.isLiked ? "#ef4444" : "#facc15"}
               size={25}
             />
           </TouchableOpacity>
