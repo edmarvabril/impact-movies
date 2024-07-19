@@ -10,6 +10,7 @@ import { fetchMovieDetails } from "@/utils/api";
 import { useLikedMovies } from "@/contexts/LikedMoviesContext";
 import EmptyLikedList from "@/components/EmptyLikedList";
 import MovieCard from "@/components/MovieCard";
+import { Movie } from "@/types";
 
 const Liked: React.FC = () => {
   const [likedMovies, setLikedMovies] = useState<Movie[]>([]);

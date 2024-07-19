@@ -4,24 +4,18 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Icon } from "./Icon";
+import { Movie } from "@/types";
 
 interface HighlightedMovieProps {
-  movie: {
-    id: number;
-    title: string;
-    poster_path: string;
-    backdrop_path: string;
-    release_date: string;
-    vote_average: number;
-    genres: string[];
-    isLiked: boolean;
-  };
+  movie: Movie;
+  isLiked: boolean;
   onLikeToggle: (id: number) => void;
 }
 
 const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
   movie,
   onLikeToggle,
+  isLiked,
 }) => {
   return (
     <Animated.View
@@ -68,8 +62,8 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
             className="bg-zinc-800 h-8 w-8 rounded-full ml-2 justify-center items-center"
           >
             <Icon
-              name={movie.isLiked ? "heart" : "heart-outline"}
-              color={movie.isLiked ? "#ef4444" : "#facc15"}
+              name={isLiked ? "heart" : "heart-outline"}
+              color={isLiked ? "#ef4444" : "#facc15"}
               size={25}
             />
           </TouchableOpacity>
@@ -80,7 +74,7 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
           <Text className="text-gray-400">Rating</Text>
         </Text>
         <View className="flex-row flex-wrap mt-2">
-          {movie.genres.map((genre, index) => (
+          {movie.genre_ids.map((genre, index) => (
             <View
               key={index}
               className="border border-gray-400 px-2 mx-1 rounded-full"

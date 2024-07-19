@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   FlatList,
   TextInput,
   TouchableOpacity,
-  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,18 +13,9 @@ import { Icon } from "@/components/Icon";
 import EmptyExploreList from "@/components/EmptyExploreList";
 import MovieCard from "@/components/MovieCard";
 import { useLikedMovies } from "@/contexts/LikedMoviesContext";
+import { Movie } from "@/types";
 
-const { width } = Dimensions.get("window");
 const numColumns = 2;
-const itemWidth = (width - 32) / numColumns;
-
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-  release_date: string;
-  vote_average: number;
-}
 
 const Explore: React.FC = () => {
   const [query, setQuery] = useState<string>("");

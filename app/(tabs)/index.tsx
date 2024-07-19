@@ -15,6 +15,7 @@ import StyledButton from "@/components/StyledButton";
 import { useLikedMovies } from "@/contexts/LikedMoviesContext";
 import MovieCard from "@/components/MovieCard";
 import { Icon } from "@/components/Icon";
+import { Movie } from "@/types";
 
 const TopRated: React.FC = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const TopRated: React.FC = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [highlightedMovie, setHighlightedMovie] = useState(null);
+  const [highlightedMovie, setHighlightedMovie] = useState<Movie | null>(null);
   const { likedMovies, toggleLike } = useLikedMovies();
 
   const { data: genresData, isLoading: isGenresLoading } = useQuery({
@@ -35,19 +36,22 @@ const TopRated: React.FC = () => {
       ? parseInt(selectedGenre)
       : undefined;
 
-  const fetchMovies = useCallback(async (pageNumber, genreId) => {
-    setLoading(true);
-    try {
-      const data = await fetchTopRatedMovie(pageNumber, genreId);
-      setMovies((prevMovies) =>
-        pageNumber === 1 ? data.results : [...prevMovies, ...data.results]
-      );
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchMovies = useCallback(
+    async (pageNumber: number | undefined, genreId: number | undefined) => {
+      setLoading(true);
+      try {
+        const data = await fetchTopRatedMovie(pageNumber, genreId);
+        setMovies((prevMovies) =>
+          pageNumber === 1 ? data.results : [...prevMovies, ...data.results]
+        );
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     setPage(1); // Reset to first page when genre changes
@@ -71,10 +75,12 @@ const TopRated: React.FC = () => {
   }, [movies]);
 
   const getGenreNames = useCallback(
-    (genreIds) => {
+    (genreIds: any[]) => {
       if (!genresData) return [];
       return genreIds.map(
-        (id) => genresData.genres.find((genre) => genre.id === id)?.name || ""
+        (id: any) =>
+          genresData.genres.find((genre: { id: any }) => genre.id === id)
+            ?.name || ""
       );
     },
     [genresData]
@@ -94,6 +100,7 @@ const TopRated: React.FC = () => {
     genresData && (
       <HighlightedMovie
         onLikeToggle={(id) => toggleLike(id)}
+        isLiked={likedMovies.has(highlightedMovie.id)}
         movie={{
           id: highlightedMovie.id,
           title: highlightedMovie.title,
@@ -101,19 +108,20 @@ const TopRated: React.FC = () => {
           backdrop_path: image500(highlightedMovie.backdrop_path),
           release_date: highlightedMovie.release_date,
           vote_average: highlightedMovie.vote_average,
-          genres: getGenreNames(highlightedMovie.genre_ids),
-          isLiked: likedMovies.has(highlightedMovie.id),
+          genre_ids: getGenreNames(highlightedMovie.genre_ids),
         }}
       />
     );
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Movie }) => (
     <MovieCard
       movie={item}
       isLiked={likedMovies.has(item.id)}
       onLikeToggle={toggleLike}
     />
   );
+
+  console.warn("ASDLKFJADHLSFJASF", movies[0]);
 
   return (
     <View className="flex-1 bg-slate-900">
@@ -127,8 +135,9 @@ const TopRated: React.FC = () => {
         >
           <Text className="text-gray-400 text-sm mr-1">
             {selectedGenre && selectedGenre !== "null"
-              ? genresData?.genres.find((g) => g.id === parseInt(selectedGenre))
-                  ?.name
+              ? genresData?.genres.find(
+                  (g: { id: number }) => g.id === parseInt(selectedGenre)
+                )?.name
               : "ALL"}
           </Text>
           <Icon name="chevron-down" color={"#9ca3af"} size={15} />
