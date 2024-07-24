@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Icon } from "./Icon";
 import { Movie } from "@/types";
+import { useRouter } from "expo-router";
 
 interface HighlightedMovieProps {
   movie: Movie;
@@ -17,6 +18,8 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
   onLikeToggle,
   isLiked,
 }) => {
+  const router = useRouter();
+
   return (
     <Animated.View
       entering={FadeIn.duration(500)}
@@ -39,6 +42,7 @@ const HighlightedMovie: React.FC<HighlightedMovieProps> = ({
       <View className="items-center" style={{ marginTop: -70 }}>
         <View className="flex-row mx-2">
           <TouchableOpacity
+            onPress={() => router.push(`/movie/details?id=${movie.id}`)}
             className="bg-zinc-800 py-1 px-3 rounded-full h-8 justify-center max-w-xs shadow"
             style={{
               shadowColor: "#171717",

@@ -36,12 +36,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="movie/details"
             options={{
-              headerTitle: "",
-              headerTintColor: "#f9fafb",
-              headerBackTitleVisible: false,
-              headerStyle: {
-                backgroundColor: "#0f172a",
-              },
+              headerShown: false,
             }}
           />
 

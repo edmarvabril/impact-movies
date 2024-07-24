@@ -121,8 +121,6 @@ const TopRated: React.FC = () => {
     />
   );
 
-  console.warn("ASDLKFJADHLSFJASF", movies[0]);
-
   return (
     <View className="flex-1 bg-slate-900">
       <SafeAreaView className="flex-row justify-between items-center mx-4 my-4">

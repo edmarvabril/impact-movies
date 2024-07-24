@@ -6,11 +6,14 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { fetchMovieDetails, image500 } from "@/utils/api";
 import { Icon } from "@/components/Icon";
 import { useLikedMovies } from "@/contexts/LikedMoviesContext";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface MovieDetails {
   id: number;
@@ -65,11 +68,25 @@ const MovieDetailsScreen: React.FC = () => {
 
   return (
     <ScrollView className="flex-1 bg-slate-900">
-      <Image
+      <ImageBackground
         source={{ uri: image500(movie.backdrop_path) }}
-        className="w-full h-64 object-cover"
-        resizeMode="cover"
-      />
+        className="w-full h-96"
+      >
+        <SafeAreaView>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Icon
+              className="shadow shadow-amber-100"
+              name="chevron-back"
+              color="#0f172a"
+              size={48}
+            />
+          </TouchableOpacity>
+        </SafeAreaView>
+        <LinearGradient
+          colors={["transparent", "#0f172a"]}
+          className="absolute bottom-0 w-full h-1/2"
+        />
+      </ImageBackground>
       <View className="p-4">
         <View className="flex-row justify-between items-center">
           <Text className="text-white text-2xl font-bold">{movie.title}</Text>
